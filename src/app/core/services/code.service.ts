@@ -9,14 +9,15 @@ import { Observable } from 'rxjs';
 })
 export class CodeService extends AbstractRestService {
 
-  readonly baseUrl = environment.apiUrl + '/api';
+  readonly codingBaseUrl = environment.codingApiUrl + '/api';
+  readonly redactBaseUrl = environment.redactApiUrl + '/api';
 
   constructor(private _httpClient: HttpClient) {
     super(_httpClient);
   }
 
    codes(payload: FormData): Observable<any> {  
-    const url = `${this.baseUrl}/code`;
+    const url = `${this.codingBaseUrl}/code`;
     return this.httpPost({
       url: url,
       payload: payload
@@ -24,7 +25,7 @@ export class CodeService extends AbstractRestService {
   }
 
    redact(payload: FormData): Observable<any> {  
-    const url = `${this.baseUrl}/redact`;
+    const url = `${this.redactBaseUrl}/redact`;
     return this.httpPost({
       url: url,
       payload: payload
@@ -32,7 +33,7 @@ export class CodeService extends AbstractRestService {
   }
 
    askQuestion(payload: FormData): Observable<any> {  
-    const url = `${this.baseUrl}/ask`;
+    const url = `${this.codingBaseUrl}/ask`;
     return this.httpPost({
       url: url,
       payload: payload

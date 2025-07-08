@@ -1,11 +1,11 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { RouterLink, RouterLinkActive } from '@angular/router';
 import { DemoButtonService } from '../../Shared-service/DemoButtonService';
 
 @Component({
   selector: 'app-header',
-  imports: [CommonModule,RouterLink],
+  imports: [CommonModule,RouterLink,RouterLinkActive],
   templateUrl: './header.component.html',
   styleUrl: './header.component.scss'
 })

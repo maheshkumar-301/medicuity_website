@@ -26,6 +26,11 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./features/solutions/solutions/solutions.component').then((m) => m.SolutionsComponent),
       },
+      {
+        path: 'quick-test',
+        loadComponent: () =>
+          import('./features/document-processing/document-processing.component').then((m) => m.DocumentProcessingComponent),
+      },
     ]
   },
   {

@@ -12,10 +12,11 @@
       <!-- Desktop Navigation -->
       <div class="hidden md:flex items-center space-x-6 font-sans text-base">
         <nav class="flex space-x-6">
-          <a routerLink="/" class="hover:text-blue-400 text-gray-700">Home</a>
-          <a routerLink="/solutions" class="text-gray-700 hover:text-blue-600">Solutions</a>
-          <a routerLink="/about" class="text-gray-700 hover:text-blue-600">About</a>
-          <a routerLink="/contact" class="text-gray-700 hover:text-blue-600">Contact</a>
+          <a routerLink="/"    routerLinkActive="!text-blue-600 font-medium" 
+     [routerLinkActiveOptions]="{exact: true}"  class="hover:text-blue-600 text-gray-700">Home</a>
+          <a routerLink="/solutions" routerLinkActive="!text-blue-600 font-medium" class="text-gray-700 hover:text-blue-600">Solutions</a>
+          <a routerLink="/about"  routerLinkActive="!text-blue-600 font-medium"  class="text-gray-700 hover:text-blue-600">About</a>
+          <a routerLink="/contact"   routerLinkActive="!text-blue-600 font-medium"  class="text-gray-700 hover:text-blue-600">Contact</a>
         </nav>
         <a href="#demo-form" (click)="onRequestDemoClick()"
    class="bg-blue-600 text-white px-5 py-2.5 rounded-xl hover:bg-blue-700 transition-colors text-base">
@@ -38,10 +39,10 @@
 
   <!-- Mobile Navigation -->
   <div *ngIf="mobileMenuOpen" class="md:hidden px-4 pb-4 space-y-2 font-poppins text-base font-semibold bg-white">
-  <a routerLink="/" (click)="onMobileLinkClick()" class="block text-gray-700 hover:text-blue-600">Home</a>
-  <a routerLink="/solutions" (click)="onMobileLinkClick()" class="block text-gray-700 hover:text-blue-600">Solutions</a>
-  <a routerLink="/about" (click)="onMobileLinkClick()" class="block text-gray-700 hover:text-blue-600">About</a>
-  <a routerLink="/contact" (click)="onMobileLinkClick()" class="block text-gray-700 hover:text-blue-600">Contact</a>
+  <a routerLink="/"  [routerLinkActiveOptions]="{exact: true}"   routerLinkActive="!text-blue-600 font-medium"  (click)="onMobileLinkClick()" class="block text-gray-700 hover:text-blue-600">Home</a>
+  <a routerLink="/solutions" routerLinkActive="!text-blue-600 font-medium"  (click)="onMobileLinkClick()" class="block text-gray-700 hover:text-blue-600">Solutions</a>
+  <a routerLink="/about"  routerLinkActive="!text-blue-600 font-medium"   (click)="onMobileLinkClick()" class="block text-gray-700 hover:text-blue-600">About</a>
+  <a routerLink="/contact"  routerLinkActive="!text-blue-600 font-medium"  (click)="onMobileLinkClick()" class="block text-gray-700 hover:text-blue-600">Contact</a>
   <a href="#demo-form" (click)="onRequestDemoClick(); onMobileLinkClick()"
      class="block text-white bg-blue-600 hover:bg-blue-700 transition px-6 py-3 rounded text-center">
     Request Demo
