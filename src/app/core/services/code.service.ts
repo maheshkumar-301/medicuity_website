@@ -16,7 +16,7 @@ export class CodeService extends AbstractRestService {
     super(_httpClient);
   }
 
-   codes(payload: FormData): Observable<any> {  
+  codes(payload: FormData): Observable<any> {
     const url = `${this.codingBaseUrl}/code`;
     return this.httpPost({
       url: url,
@@ -24,7 +24,7 @@ export class CodeService extends AbstractRestService {
     });
   }
 
-   redact(payload: FormData): Observable<any> {  
+  redact(payload: FormData): Observable<any> {
     const url = `${this.redactBaseUrl}/redact`;
     return this.httpPost({
       url: url,
@@ -32,7 +32,7 @@ export class CodeService extends AbstractRestService {
     });
   }
 
-   askQuestion(payload: FormData): Observable<any> {  
+  askQuestion(payload: FormData): Observable<any> {
     const url = `${this.codingBaseUrl}/ask`;
     return this.httpPost({
       url: url,
@@ -40,6 +40,28 @@ export class CodeService extends AbstractRestService {
     });
   }
 
+  getRedactWorking() {
+    const url = `${this.redactBaseUrl}/hello`;
+    return this.httpGet({
+      url: url
+    })
   }
+
+  getCodingWorking() {
+    const url = `${this.codingBaseUrl}/`;
+    return this.httpGet({
+      url: url
+    })
+
+  }
+
+  getMarkets() {
+    const url = `${this.codingBaseUrl}/markets`;
+    return this.httpGet({
+      url: url
+    })
+
+  }
+}
 
 

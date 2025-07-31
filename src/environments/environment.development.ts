@@ -4,4 +4,7 @@ export const environment = {
     // apiUrl: 'https://medicuity.com',
     codingApiUrl: 'http://48.217.188.56:6002',
     redactApiUrl: 'http://48.217.188.56:6001',
+    // codingApiUrl: 'https://coding.medicuity.com',
+    // codingApiUrl: 'http://127.0.0.1:5001',
+    // redactApiUrl: 'https://redaction.medicuity.com',
 };

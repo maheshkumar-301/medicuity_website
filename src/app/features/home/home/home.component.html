@@ -313,7 +313,7 @@
                     Schedule Demo
                 </button>
 
-                <button (click)="navigateToTest()"
+                <button (click)="navigateToTest()" *ngIf="showButton"
                     class="flex items-center justify-center hover:bg-white hover:text-black hover:border cursor-pointer gap-2 text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 bg-black text-white hover:bg-black/90 h-11 rounded-md px-8 py-4 text-wrap">
                     Run a Quick Test
                 </button>

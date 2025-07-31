@@ -1,9 +1,10 @@
-import { Component, ElementRef, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
 import { CodeService } from '../../core/services/code.service';
 import { SwalAlertService } from '../../core/services/swal-alert.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { forkJoin } from 'rxjs';
 
 @Component({
   selector: 'app-document-processing',
@@ -11,7 +12,7 @@ import { FormsModule } from '@angular/forms';
   templateUrl: './document-processing.component.html',
   styleUrl: './document-processing.component.scss'
 })
-export class DocumentProcessingComponent {
+export class DocumentProcessingComponent implements OnInit{
 
     selectedFileName: string | null = null;
   selectedFileType: string | null = null;
@@ -27,6 +28,10 @@ export class DocumentProcessingComponent {
   isSubmittingCode = false;
   @ViewChild('fileInput') fileInput!: ElementRef;
   currentAction: 'redact' | 'code' | 'ask' | null = null;
+  isLoading:boolean = false;
+  isShowUpload:boolean = false;
+  selectedMarketName:string = 'USA';
+  markets!:any;
 
   constructor(
     private _codeService: CodeService,
@@ -37,7 +42,10 @@ export class DocumentProcessingComponent {
   }
 
   
-
+ngOnInit(): void {
+  this.fetchMarkets();
+  this.navigateToTest();
+}
 
   onFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
@@ -137,7 +145,6 @@ this._swalAlertService.warningAlert(
         // Optionally: show result or message to user
       },
       error: (error) => {
-        console.error('Redaction failed:', error);
         this.isSubmittingRedact = false;
       this._swalAlertService.errorAlert('Redaction Failed', 'Something went wrong while redacting the document.');
       }
@@ -153,6 +160,7 @@ this._swalAlertService.warningAlert(
     this.isSubmittingCode = true;
     const formData = new FormData();
     formData.append('content', content);
+    formData.append('market', this.selectedMarketName);
     this._codeService.codes(formData).subscribe({
       next: (response) => {
         try{
@@ -165,7 +173,10 @@ this._swalAlertService.warningAlert(
           this.isSubmittingCode = false;
         }
       }, error: (err) => {
+         this._swalAlertService.errorAlert('Failed', err.error.message);
         this.isSubmittingCode = false;
+        this.responses = ''
+        this.codeResponse = null;
       }
     })
   }
@@ -188,7 +199,7 @@ this._swalAlertService.warningAlert(
           this.isAskingQuestion = false;
       }, error: (err) => {
           this.isAskingQuestion = false;
-        console.log(err);
+   this._swalAlertService.errorAlert('Failed', err.error.message);
       },
       complete: () => {
         this.isAskingQuestion = false;
@@ -225,6 +236,32 @@ this._swalAlertService.warningAlert(
   this.currentAction = null;
 
 }
+
+ navigateToTest(){
+  this.isLoading = true;
+      forkJoin([
+    this._codeService.getCodingWorking(),
+    this._codeService.getRedactWorking()
+  ]).subscribe({
+    next: ([codingResult, redactResult]) => {
+      this.isShowUpload = true;
+      this.isLoading = false;
+    },
+    error: (err) => {
+      this.isLoading = false;
+      this.isShowUpload = false;
+    }
+  });
+  }
+
+  fetchMarkets(){
+    this._codeService.getMarkets().subscribe({
+      next: (res:any) => {
+        this.markets = res?.response;
+        this.selectedMarketName = this.markets[0]?.name;
+      }
+    })
+  }
 
 
 }

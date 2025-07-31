@@ -3,7 +3,7 @@ import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/co
 import { FormsModule } from '@angular/forms';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { RecaptchaModule } from 'ng-recaptcha';
-import { Subscription } from 'rxjs';
+import { forkJoin, Subscription } from 'rxjs';
 import { DemoButtonService } from '../../../Shared-service/DemoButtonService';
 import { CodeService } from '../../../core/services/code.service';
 import Swal from 'sweetalert2';
@@ -26,6 +26,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   isModalOpen = false;
   calendlySafeUrl: SafeResourceUrl;
   private subscription!: Subscription;
+  showButton: boolean = false;
 
 
 
@@ -153,6 +154,17 @@ export class HomeComponent implements OnInit, OnDestroy {
         this.demoButtonText = text;
       }
     );
+   forkJoin([
+    this._codeService.getCodingWorking(),
+    this._codeService.getRedactWorking()
+  ]).subscribe({
+    next: ([codingResult, redactResult]) => {
+      this.showButton = true;
+    },
+    error: (err) => {
+      this.showButton = false;
+    }
+  });
   }
 
   ngOnDestroy() {
@@ -183,7 +195,41 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   navigateToTest(){
-this._router.navigateByUrl('/quick-test')
+      forkJoin([
+    this._codeService.getCodingWorking(),
+    this._codeService.getRedactWorking()
+  ]).subscribe({
+    next: ([codingResult, redactResult]) => {
+      this._router.navigateByUrl('/quick-test')
+    },
+    error: (err) => {
+           this._swalAlertService.warningAlert(
+        'Service Unavailable',
+        'Please try again later.'
+      );
+    }
+  });
   }
+
+  fetchRedactWorking(){
+    this._codeService.getRedactWorking().subscribe({
+      next: (data) => {
+        console.log("itwork");
+      },error:(err)=>{
+        console.log("it dont work");
+      }
+    })
+  }
+
+  fetchCodingWorking(){
+    this._codeService.getCodingWorking().subscribe({
+      next: (data) => {
+         console.log("itwork codin");
+      },error:(err)=>{
+        console.log("it dont work coding");
+      }
+    })
+  }
+
 
 }
