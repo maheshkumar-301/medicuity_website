@@ -9,13 +9,15 @@ import { CodeService } from '../../../core/services/code.service';
 import Swal from 'sweetalert2';
 import { SwalAlertService } from '../../../core/services/swal-alert.service';
 import { Router } from '@angular/router';
+import { CalendlyModalComponent } from '../../calendly-modal/calendly-modal.component';
+import { EmailService } from '../../../core/services/email.service';
 
 
 declare var grecaptcha: any;
 
 @Component({
   selector: 'app-home',
-  imports: [CommonModule, FormsModule, RecaptchaModule],
+  imports: [CommonModule, FormsModule, RecaptchaModule, CalendlyModalComponent],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss'
 })
@@ -27,6 +29,8 @@ export class HomeComponent implements OnInit, OnDestroy {
   calendlySafeUrl: SafeResourceUrl;
   private subscription!: Subscription;
   showButton: boolean = false;
+  loading = false;
+
 
 
 
@@ -36,7 +40,8 @@ export class HomeComponent implements OnInit, OnDestroy {
     private _codeService: CodeService,
     private sanitizer: DomSanitizer,
     private _swalAlertService: SwalAlertService,
-    private _router:Router
+    private _router: Router,
+    private emailService: EmailService,
   ) {
     const calendlyUrl = 'https://calendly.com/medicuity-info/30min';
     this.calendlySafeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(calendlyUrl);
@@ -69,23 +74,48 @@ export class HomeComponent implements OnInit, OnDestroy {
     phone: ''
   };
 
-  sendEmail() {
 
+  sendEmail(form: any) {
+    if (form.invalid || this.loading) {
+      this._swalAlertService.errorAlert('Error', 'Please fill out all required fields correctly.');
+      return;
+    }
 
-    const subject = encodeURIComponent(`${this.demoButtonText}`);
-    const body = encodeURIComponent(
-      `Request Type: ${this.demoButtonText}\n` +
-      `First Name: ${this.formData.firstName}\n` +
-      `Last Name: ${this.formData.lastName}\n` +
-      `Email: ${this.formData.email}\n` +
-      `Organization: ${this.formData.organization}\n` +
-      `Phone: ${this.formData.phone}\n`
+    this.loading = true; // start loading
 
-    );
+    const payload = {
+      ...this.formData,
+      formType: 'demo',
+    };
 
-    const mailtoLink = `mailto:info@medicuity.com?subject=${subject}&body=${body}`;
-    window.location.href = mailtoLink;
+    this.emailService.sendEmail(payload).subscribe({
+      next: () => {
+        this._swalAlertService.successAlert('Success', 'Message sent successfully. We will contact you soon.');
+        this.formData = {
+          firstName: '',
+          lastName: '',
+          email: '',
+          organization: '',
+          phone: '',
+        };
+        form.resetForm();
+        this.loading = false; // stop loading
+      },
+      error: (err) => {
+        const detail = err.error?.detail;
+        let errorMessage = 'Failed to send email. Please try again.';
+        if (Array.isArray(detail)) {
+          const emailError = detail.find((e) => e.loc?.includes('email'));
+          if (emailError) {
+            errorMessage = 'Please enter a valid email address.';
+          }
+        }
+        this._swalAlertService.errorAlert('Error', errorMessage);
+        this.loading = false; // stop loading
+      },
+    });
   }
+
 
 
   captchaVerified = false;
@@ -154,17 +184,17 @@ export class HomeComponent implements OnInit, OnDestroy {
         this.demoButtonText = text;
       }
     );
-   forkJoin([
-    this._codeService.getCodingWorking(),
-    this._codeService.getRedactWorking()
-  ]).subscribe({
-    next: ([codingResult, redactResult]) => {
-      this.showButton = true;
-    },
-    error: (err) => {
-      this.showButton = false;
-    }
-  });
+    forkJoin([
+      this._codeService.getCodingWorking(),
+      this._codeService.getRedactWorking()
+    ]).subscribe({
+      next: ([codingResult, redactResult]) => {
+        this.showButton = true;
+      },
+      error: (err) => {
+        this.showButton = false;
+      }
+    });
   }
 
   ngOnDestroy() {
@@ -194,38 +224,38 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.currentSlide = index;
   }
 
-  navigateToTest(){
-      forkJoin([
-    this._codeService.getCodingWorking(),
-    this._codeService.getRedactWorking()
-  ]).subscribe({
-    next: ([codingResult, redactResult]) => {
-      this._router.navigateByUrl('/quick-test')
-    },
-    error: (err) => {
-           this._swalAlertService.warningAlert(
-        'Service Unavailable',
-        'Please try again later.'
-      );
-    }
-  });
+  navigateToTest() {
+    forkJoin([
+      this._codeService.getCodingWorking(),
+      this._codeService.getRedactWorking()
+    ]).subscribe({
+      next: ([codingResult, redactResult]) => {
+        this._router.navigateByUrl('/quick-test')
+      },
+      error: (err) => {
+        this._swalAlertService.warningAlert(
+          'Service Unavailable',
+          'Please try again later.'
+        );
+      }
+    });
   }
 
-  fetchRedactWorking(){
+  fetchRedactWorking() {
     this._codeService.getRedactWorking().subscribe({
       next: (data) => {
         console.log("itwork");
-      },error:(err)=>{
+      }, error: (err) => {
         console.log("it dont work");
       }
     })
   }
 
-  fetchCodingWorking(){
+  fetchCodingWorking() {
     this._codeService.getCodingWorking().subscribe({
       next: (data) => {
-         console.log("itwork codin");
-      },error:(err)=>{
+        console.log("itwork codin");
+      }, error: (err) => {
         console.log("it dont work coding");
       }
     })

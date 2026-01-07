@@ -1,15 +1,23 @@
 import { CommonModule } from '@angular/common';
 import { Component, NgModule } from '@angular/core';
 import { FormBuilder, FormGroup, FormsModule, NgModel, ReactiveFormsModule, Validators } from '@angular/forms';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { CalendlyModalComponent } from '../../calendly-modal/calendly-modal.component';
+import { EmailService } from '../../../core/services/email.service';
+import { SwalAlertService } from '../../../core/services/swal-alert.service';
 
 @Component({
   selector: 'app-contact',
-  imports: [CommonModule, ReactiveFormsModule, FormsModule],
+  imports: [CommonModule, ReactiveFormsModule, FormsModule,CalendlyModalComponent],
   templateUrl: './contact.component.html',
   styleUrl: './contact.component.scss'
 })
 export class ContactComponent {
+    isModalOpen = false;
+  calendlySafeUrl!: SafeResourceUrl;
   info: String = 'info@medicuity.com';
+  loading: boolean = false;
+
 
   formData = {
     firstName: '',
@@ -23,6 +31,21 @@ export class ContactComponent {
   captcha: string = '';
   captchaInput: string = '';
   captchaVerified: boolean = false;
+
+  
+  constructor(
+    private sanitizer: DomSanitizer,private emailService: EmailService, private swalAlertService:SwalAlertService){
+    const calendlyUrl = 'https://calendly.com/medicuity-info/30min';
+    this.calendlySafeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(calendlyUrl);
+  }
+
+    openModal() {
+    this.isModalOpen = true;
+  }
+
+  closeModal() {
+    this.isModalOpen = false;
+  }
 
   ngOnInit() {
     this.generateCaptcha();
@@ -51,28 +74,57 @@ export class ContactComponent {
     }
   }
 
-  sendEmail() {
-    const subject = encodeURIComponent('Contact Form');
-    const body = encodeURIComponent(
-      `First Name: ${this.formData.firstName}\n` +
-      `Last Name: ${this.formData.lastName}\n` +
-      `Email: ${this.formData.email}\n` +
-      `Organization: ${this.formData.organization}\n` +
-      `Phone Number: ${this.formData.phone}\n` +
-      `Message: ${this.formData.message}`
-    );
-
-    const mailtoLink = `mailto:info@medicuity.com?subject=${subject}&body=${body}`;
-    window.location.href = mailtoLink;
+onSubmit(form: any) {
+  if (!this.captchaVerified) {
+    this.captchaMessage = '⚠️ Please verify CAPTCHA before submitting!';
+    this.captchaMessageClass = 'text-yellow-600';
+    return;
   }
 
-  onSubmit() {
-    if (!this.captchaVerified) {
-      this.captchaMessage = '⚠️ Please verify CAPTCHA before submitting!';
-      this.captchaMessageClass = 'text-yellow-600';
-      return;
-    }
+  if (this.loading) return; // Prevent multiple clicks
 
-    this.sendEmail();
-  }
+  this.sendEmail(form);
+}
+
+sendEmail(form: any) {
+  this.loading = true; // start loading
+
+  const payload = {
+    ...this.formData,
+    formType: 'contact',
+  };
+
+  this.emailService.sendEmail(payload).subscribe({
+    next: () => {
+      this.swalAlertService.successAlert('Success', 'Message sent successfully. We will contact you soon.');
+
+      this.formData = {
+        firstName: '',
+        lastName: '',
+        email: '',
+        organization: '',
+        phone: '',
+        message: '',
+      };
+
+      this.generateCaptcha();
+      this.captchaMessage = '';
+      form.resetForm(); // reset form
+      this.loading = false; // stop loading
+    },
+    error: (err) => {
+      const detail = err.error?.detail;
+      let errorMessage = 'Failed to send email. Please try again.';
+      if (Array.isArray(detail)) {
+        const emailError = detail.find((e) => e.loc?.includes('email'));
+        if (emailError) {
+          errorMessage = 'Please enter a valid email address.';
+        }
+      }
+      this.swalAlertService.errorAlert('Error', errorMessage);
+      this.loading = false; // stop loading
+    },
+  });
+}
+
 }

@@ -411,7 +411,7 @@
                             class="w-full bg-white text-blue-900 px-6 py-3 rounded-lg hover:bg-gray-100 transition-colors font-semibold"
                             type="submit">{{demoButtonText}}</button>
                     </form> -->
-                    <form id="demo-form" (ngSubmit)="sendEmail()" #demoForm="ngForm" class="space-y-4">
+                    <!-- <form id="demo-form" (ngSubmit)="sendEmail()" #demoForm="ngForm" class="space-y-4">
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <input name="firstName" [(ngModel)]="formData.firstName" required
                                 class="w-full px-4 py-3 rounded-lg bg-white/20 border border-white/30 text-white placeholder-blue-200"
@@ -436,7 +436,62 @@
                         <button
                             class="w-full bg-white text-blue-900 px-6 py-3 rounded-lg hover:bg-gray-100 transition-colors font-semibold"
                             type="submit">{{ demoButtonText }}</button>
-                    </form>
+                    </form> -->
+
+                    <form id="demo-form" (ngSubmit)="sendEmail(demoForm)" #demoForm="ngForm" class="space-y-4">
+
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+    <div class="group">
+      <input name="firstName" [(ngModel)]="formData.firstName" #firstNameRef="ngModel" required
+          class="w-full px-4 py-3 rounded-lg bg-white/20 border border-white/30 text-white placeholder-blue-200"
+          type="text" placeholder="First Name" />
+      <p *ngIf="firstNameRef.invalid && firstNameRef.touched" class="text-red-500 text-sm mt-1">
+        First name is required.
+      </p>
+    </div>
+
+    <div class="group">
+      <input name="lastName" [(ngModel)]="formData.lastName" #lastNameRef="ngModel" required
+          class="w-full px-4 py-3 rounded-lg bg-white/20 border border-white/30 text-white placeholder-blue-200"
+          type="text" placeholder="Last Name" />
+      <p *ngIf="lastNameRef.invalid && lastNameRef.touched" class="text-red-500 text-sm mt-1">
+        Last name is required.
+      </p>
+    </div>
+  </div>
+
+  <div class="group">
+    <input name="email" [(ngModel)]="formData.email" #emailRef="ngModel" required email
+        class="w-full px-4 py-3 rounded-lg bg-white/20 border border-white/30 text-white placeholder-blue-200"
+        type="email" placeholder="Work Email" />
+    <p *ngIf="emailRef.invalid && emailRef.touched" class="text-red-500 text-sm mt-1">
+      Please enter a valid email.
+    </p>
+  </div>
+
+  <div class="group">
+    <input name="organization" [(ngModel)]="formData.organization" #orgRef="ngModel" required
+        class="w-full px-4 py-3 rounded-lg bg-white/20 border border-white/30 text-white placeholder-blue-200"
+        type="text" placeholder="Organization Name" />
+    <p *ngIf="orgRef.invalid && orgRef.touched" class="text-red-500 text-sm mt-1">
+      Organization is required.
+    </p>
+  </div>
+
+  <div class="group">
+    <input name="phone" [(ngModel)]="formData.phone" #phoneRef="ngModel"
+        class="w-full px-4 py-3 rounded-lg bg-white/20 border border-white/30 text-white placeholder-blue-200"
+        type="tel" placeholder="Phone Number" />
+  </div>
+
+<button
+    class="w-full bg-white text-blue-900 px-6 py-3 rounded-lg hover:bg-gray-100 transition-colors font-semibold"
+    type="submit"
+    [disabled]="demoForm.invalid || loading">
+    {{ loading ? 'Sending...' : demoButtonText }}
+</button>
+
+</form>
 
                     <div class="text-center">
                         <p class="text-sm text-blue-200">Or email us directly at <a
@@ -453,10 +508,14 @@
 
 
 
-
+<app-calendly-modal
+  [isModalOpen]="isModalOpen"
+  [calendlySafeUrl]="calendlySafeUrl"
+  (close)="closeModal()">
+</app-calendly-modal>
 
 <!-- Calendly Modal -->
-<div *ngIf="isModalOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-black/10 backdrop-blur-sm ">
+<!-- <div *ngIf="isModalOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-black/10 backdrop-blur-sm ">
     <div
         class="bg-white rounded-lg p-4 sm:p-6 w-[95%] sm:w-full max-w-3xl relative shadow-xl hide-scrollbar overflow-hidden ">
         <button (click)="closeModal()" class="absolute top-2 right-2 text-2xl text-gray-500 hover:text-black">
@@ -464,4 +523,4 @@
         </button>
         <iframe [src]="calendlySafeUrl" class="rounded-lg w-full h-[75vh] " frameborder="0" allowfullscreen></iframe>
     </div>
-</div>
+</div> -->

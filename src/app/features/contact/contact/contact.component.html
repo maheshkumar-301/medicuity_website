@@ -85,10 +85,10 @@
                 <path d="M3 10h18"></path>
               </svg>
             </div>
-            <div>
+            <div (click)="openModal()" class="cursor-pointer">
               <h3 class="font-semibold text-gray-900">Schedule a Demo</h3>
               <p class="text-gray-600">Book a personalized 30-minute demo</p>
-              <button class="text-blue-600 hover:text-blue-700 font-medium text-sm mt-1">View available times →</button>
+              <button class="text-blue-600 hover:text-blue-700 font-medium text-sm mt-1 cursor-pointer" (click)="openModal()" >View available times →</button>
             </div>
 
           </div>
@@ -104,7 +104,7 @@
     <p class="text-gray-600">Fill out the form below and we'll get back to you within 24 hours.</p>
   </div>
 
-  <form (ngSubmit)="onSubmit()" #formRef="ngForm" class="space-y-6">
+  <form (ngSubmit)="onSubmit(formRef)" #formRef="ngForm" class="space-y-6">
     <!-- First and Last Name -->
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
       <div class="group">
@@ -208,13 +208,13 @@
 
     <!-- Submit Button -->
     <div class="pt-2">
-      <button type="submit" [disabled]="!formRef.valid || !captchaVerified" 
-              [ngClass]="captchaVerified && formRef.valid ? 
-                'bg-blue-600 hover:bg-blue-700 text-white shadow-md hover:shadow-lg' : 
-                'bg-gray-300 text-gray-500 cursor-not-allowed'"
-              class="w-full px-6 py-3 rounded-lg font-semibold transition-all duration-300 transform hover:scale-[1.01]">
-        Send Message
-      </button>
+<button type="submit" [disabled]="!formRef.valid || !captchaVerified || loading" 
+        [ngClass]="captchaVerified && formRef.valid && !loading ? 
+          'bg-blue-600 hover:bg-blue-700 text-white shadow-md hover:shadow-lg' : 
+          'bg-gray-300 text-gray-500 cursor-not-allowed'"
+        class="w-full px-6 py-3 rounded-lg font-semibold transition-all duration-300 transform hover:scale-[1.01]">
+  {{ loading ? 'Sending...' : 'Send Message' }}
+</button>
     </div>
   </form>
 
@@ -271,3 +271,9 @@
     </div>
   </div>
 </section>
+
+<app-calendly-modal
+  [isModalOpen]="isModalOpen"
+  [calendlySafeUrl]="calendlySafeUrl"
+  (close)="closeModal()">
+</app-calendly-modal>
