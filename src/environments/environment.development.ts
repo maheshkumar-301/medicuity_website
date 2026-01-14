@@ -7,6 +7,7 @@ export const environment = {
     codingApiUrl: 'https://coding.medicuity.com',
     // codingApiUrl: 'http://127.0.0.1:5001',
     redactApiUrl: 'https://redaction.medicuity.com',
-    emailApiUrl:'https://medicuity.com'
+    // emailApiUrl:'https://medicuity.com'
+    emailApiUrl:'https://medicuity-email.onrender.com'
     // emailApiUrl:'http://192.168.1.7:8000'
 };
